@@ -1,0 +1,40 @@
+info: Aug-09-2022 16:54:59: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 16:55:00: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 16:57:02: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 16:57:02: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 16:59:18: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 16:59:18: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:02:59: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:02:59: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:03:06: 	SignUp Req
+info: Aug-09-2022 17:03:06: 	[object Object]
+info: Aug-09-2022 17:07:05: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:07:05: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:07:12: 	SignUp Req
+info: Aug-09-2022 17:07:12: 	[object Object]
+info: Aug-09-2022 17:07:46: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:07:47: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:08:04: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:08:05: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:08:08: 	SignUp Req
+info: Aug-09-2022 17:08:08: 	{"email":"dhairya456@gmail.com","password":"dhairya1234"}
+info: Aug-09-2022 17:11:57: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:11:58: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:13:25: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:13:25: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:14:31: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:14:32: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:17:08: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:17:09: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:32:18: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:32:18: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:32:50: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:32:50: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:33:36: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:33:36: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:36:14: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:36:14: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:39:10: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:39:11: 	Connected to Mongo! Database name: "contractor"
+info: Aug-09-2022 17:41:24: 	Server started and running on http://localhost:5000
+info: Aug-09-2022 17:41:24: 	Connected to Mongo! Database name: "contractor"
