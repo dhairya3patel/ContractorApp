@@ -61,5 +61,7 @@ buck-out/
 /vendor/bundle/
 
 
-/files/images/
-/server/logs/
+*.log
+*.png
+*.jpg
+*.jpeg
