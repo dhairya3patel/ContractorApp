@@ -60,8 +60,5 @@ buck-out/
 /ios/Pods/
 /vendor/bundle/
 
-
-*.log
-*.png
-*.jpg
-*.jpeg
+/server/logs/*
+/server/files/images/*
