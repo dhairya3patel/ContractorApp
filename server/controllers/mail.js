@@ -15,9 +15,9 @@ const transporter = nodemailer.createTransport({
 const sendJobAssignedMail = (toUser) => {
 
     transporter.sendMail({
-        from: '"Your Name" <youremail@gmail.com>', // sender address
+        from: '"Bhild LLC" <youremail@gmail.com>', // sender address
         to: toUser, // list of receivers
-        subject: "Medium @edigleyssonsilva ✔", // Subject line
+        subject: "Job Assignment", // Subject line
         text: "There is a new article. It's about sending emails, check it out!", // plain text body
         html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
     }).then(info => {
@@ -28,9 +28,9 @@ const sendJobAssignedMail = (toUser) => {
 const sendJobReminderMail = (toUser) => {
 
     transporter.sendMail({
-        from: '"Your Name" <youremail@gmail.com>', // sender address
+        from: '"Bhild LLC" <youremail@gmail.com>', // sender address
         to: toUser, // list of receivers
-        subject: "Medium @edigleyssonsilva ✔", // Subject line
+        subject: "Job Reminder", // Subject line
         text: "There is a new article. It's about sending emails, check it out!", // plain text body
         html: "<b>There is a new article. It's about sending emails, check it out!</b>", // html body
     }).then(info => {

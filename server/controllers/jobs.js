@@ -30,25 +30,28 @@ const logger = createLogger({
             format.timestamp({format: 'MMM-DD-YYYY HH:mm:ss'}),
             format.align(),
             format.printf(info => {
-                return `${info.level}: ${[info.timestamp]}: ${info.message}`
+                const message = JSON.parse(info.message)
+                return `${info.level}: ${[info.timestamp]}: [${message.user}]: ${message.message}`
             }),
         )}),
 })
 
 const createJob = (req, res, next) => {
 
-    logger.info('Create Job Request')
-    logger.info(JSON.stringify(req.body))
-
     const token = decodeToken(req);
 
     const user = token["id"]
+
+    logger.info(JSON.stringify({'user': user,'message':'Create Job Request'}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
 
     Manager.findOne({
         user: user, 
     })
     .then( manager => {
-        logger.info(`Manager Identified: ${manager._id}`)
+        
+        logger.info(JSON.stringify({'user': user,'message':`Manager Identified: ${manager._id}`}))
+        
         const pictures = req.body.pictures
         Image.find({
             "_id" : {"$in" : pictures}
@@ -84,12 +87,12 @@ const createJob = (req, res, next) => {
                 })
                 .deleteMany()
                 .then(() => {
-                    logger.info('Job Created')
+                    logger.info(JSON.stringify({'user': user,'message':'Job Created'}))
                     return res.status(201).json({message: "Job created"});
                 })               
             })
             .catch(err => {
-                logger.error(`Error Creating Job: ${err}`)
+                logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))
                 console.log(err);
                 return res.status(502).json({message: "error while creating Job"});
             });
@@ -98,7 +101,7 @@ const createJob = (req, res, next) => {
 
     })
     .catch( err => {
-        logger.error(`Error Creating Job: ${err}`)
+        logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))
         console.log(err);
         return res.status(404).json({message: "Manager not found"});        
     })
@@ -107,17 +110,19 @@ const createJob = (req, res, next) => {
 
 const getJobs = (req, res, next) => {
 
-    logger.info('Get Jobs Request')
-    logger.info(JSON.stringify(req.body))
+
     let token = decodeToken(req);
     let user = token["id"]
-    // console.log(user)
+
+    logger.info(JSON.stringify({'user': user,'message':'Get Jobs Request'}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
+
     Contractor.findOne({
         user: user, 
     })
     .then( Contractor => {
         // console.log()
-        logger.info(`Contractor identified: ${Contractor._id}`)
+        logger.info(JSON.stringify({'user': user,'message':`Contractor identified: ${Contractor._id}`}))
         //     console.log(op)
         //     res.status(200).json({jobs: op});
         // }).catch(err => {console.log(err)})
@@ -129,7 +134,7 @@ const getJobs = (req, res, next) => {
         .then(bids => {
             const bid = bids.map(item => {return item.job});
             // console.log(bid);
-
+            logger.info(JSON.stringify({'user': user,'message':`Job Status: ${req.body.status}`}))
             switch(req.body.status){
                 case 'Open':
                     return Job.find({
@@ -137,13 +142,14 @@ const getJobs = (req, res, next) => {
                         'status': req.body.status,
                     })
                     .then((jobList) => {
+                        // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                         res.status(200).json({
                             message: "Success",
                             jobs: jobList
                         });
                     })
                     .catch(err => {
-                        logger.error(`Error getJob ${err}`)
+                        logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                         console.log(err);
                         res.status(500).json({message: "error while getting Jobs"});
                     });
@@ -154,13 +160,14 @@ const getJobs = (req, res, next) => {
                         // status: req.body.status,
                     })
                     .then((jobList) => {
+                        // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                         res.status(200).json({
                             message: "Success",
                             jobs: jobList
                         });
                     })
                     .catch(err => {
-                        logger.error(`Error getJob ${err}`)
+                        logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                         console.log(err);
                         res.status(500).json({message: "error while getting Jobs"});
                     });
@@ -171,14 +178,14 @@ const getJobs = (req, res, next) => {
                         status: req.body.status
                     })
                     .then((jobList) => {
-                        // console.log(jobList)
+                        // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                         res.status(200).json({
                             message: "Success",
                             jobs: jobList
                         });
                     })
                     .catch(err => {
-                        logger.error(`Error getJob ${err}`)
+                        logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                         console.log(err);
                         res.status(500).json({message: "error while getting Jobs"});
                     });
@@ -189,14 +196,14 @@ const getJobs = (req, res, next) => {
                         assignedTo: Contractor
                     })
                     .then((jobList) => {
-                        // console.log(jobList)
+                        // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                         res.status(200).json({
                             message: "Success",
                             jobs: jobList
                         });
                     })
                     .catch(err => {
-                        logger.error(`Error getJob ${err}`)
+                        logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                         console.log(err);
                         res.status(500).json({message: "error while getting Jobs"});
                     });
@@ -207,13 +214,14 @@ const getJobs = (req, res, next) => {
                         status: req.body.status,
                     })
                     .then((jobList) => {
+                        // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                         res.status(200).json({
                             message: "Success",
                             jobs: jobList
                         });
                     })
                     .catch(err => {
-                        logger.error(`Error getJob ${err}`)
+                        logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                         console.log(err);
                         res.status(500).json({message: "error while getting Jobs"});
                     });
@@ -228,27 +236,28 @@ const getJobs = (req, res, next) => {
         });
     })
     .catch( err => {
-        logger.info(`Contractor not found getJobs, Checking for Manager`)
+        logger.info(JSON.stringify({'user': user,'message':`Contractor not found getJobs, Checking for Manager`}))
         Manager.findOne({
             user: user
         })
         .then(manager => {
-            logger.info(`Manager identified: ${manager._id}`)
+
+            logger.info(JSON.stringify({'user': user,'message':`Manager identified: ${manager._id}`}))
+            logger.info(JSON.stringify({'user': user,'message':`Job Status: ${req.body.status}`}))            
             switch(req.body.status){
                 case 'Bids':
                     return Job.find({
                         'status': "Bid Complete",
                     })
                     .then((jobList) => {
-                        logger.info(`JobList Bid`)
-                        logger.info(JSON.stringify(jobList))
+                        // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                         res.status(200).json({
                             message: "Success",
                             jobs: jobList
                         });
                     })
                     .catch(err => {
-                        logger.error(`Error getJob ${err}`)
+                        logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                         console.log(err);
                         res.status(500).json({message: "error while getting Jobs"});
                     });
@@ -259,8 +268,7 @@ const getJobs = (req, res, next) => {
                     })
                     .populate('assignedTo')
                     .then((jobList) => {
-                        logger.info(`JobList Assigned`)
-                        logger.info(JSON.stringify(jobList))
+                        // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                         res.status(200).json({
                             message: "Success",
                             jobs: jobList
@@ -268,7 +276,7 @@ const getJobs = (req, res, next) => {
                     })
                     .catch(err => {
                         console.log(err);
-                        logger.error(`Error getJob ${err}`)
+                        logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                         res.status(500).json({message: "error while getting Jobs"});
                     });
 
@@ -277,15 +285,14 @@ const getJobs = (req, res, next) => {
                             status: req.body.status,
                         })
                         .then((jobList) => {
-                            logger.info(`JobList Active`)
-                            logger.info(JSON.stringify(jobList))                            
+                            // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                             res.status(200).json({
                                 message: "Success",
                                 jobs: jobList
                             });
                         })
                         .catch(err => {
-                            logger.error(`Error getJob ${err}`)
+                            logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                             console.log(err);
                             res.status(500).json({message: "error while getting Jobs"});
                         });                    
@@ -295,6 +302,7 @@ const getJobs = (req, res, next) => {
                         status: req.body.status,
                     })
                     .then((jobList) => {
+                        // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
                         res.status(200).json({
                             message: "Success",
                             jobs: jobList
@@ -302,7 +310,7 @@ const getJobs = (req, res, next) => {
                     })
                     .catch(err => {
                         console.log(err);
-                        logger.error(`Error getJob ${err}`)
+                        logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
                         res.status(500).json({message: "error while getting Jobs"});
                     });
                 
@@ -323,6 +331,9 @@ const getJobById = (req, res, next) => {
 
     const user = token["id"]
 
+    logger.info(JSON.stringify({'user': user,'message':'Get JobById Request'}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
+
     Contractor.findOne({
         user: user, 
     })
@@ -330,20 +341,26 @@ const getJobById = (req, res, next) => {
 
         return Job.findOne({_id: req.body.id})
         .then((job) => {
-            if (job)
+            if (job) {
+                // logger.info(JSON.stringify({'user': user,'message': job}))
                 res.status(200).json({
                     message: "Success",
                     job: job
                 });
-            else
+            }
+            else {
+                logger.error(JSON.stringify({'user': user,'message': `Job with id ${req.body.id} not found`}))
                 res.status(404).json({message: `Job with id ${req.body.id} not found`});    
+            }
         })
         .catch(err => {
+            logger.error(JSON.stringify({'user': user,'message': `GetJobById ${err}`}))
             console.log(err);
             res.status(500).json({message: "Internal Server Error"});
         });
     })
     .catch( err => {
+        logger.error(JSON.stringify({'user': user,'message': `GetJobById ${err}`}))
         console.log(err);
         return res.status(404).json({message: "Contractor not found"});        
     })    
@@ -355,6 +372,9 @@ const changeJobStatus = (req, res, next) => {
     const token = decodeToken(req);
 
     const user = token["id"]
+
+    logger.info(JSON.stringify({'user': user,'message':'Get changeJobStatus Request'}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
 
     Contractor.findOne({
         user: user, 
@@ -369,21 +389,25 @@ const changeJobStatus = (req, res, next) => {
 
                 job.status = req.body.status;
                 job.save();
-
+                logger.info(JSON.stringify({'user': user,'message': `New Status: ${req.body.status}`}))
                 res.status(200).json({
                     status: "200",
                     message: "Job Status Changed",
                 });
             }
-            else
+            else {
+                logger.error(JSON.stringify({'user': user,'message': `Job with id ${req.body.id} not found`}))
                 res.status(404).json({message: `Job with id ${req.body.id} not found`});    
+            }
         })
         .catch(err => {
+            logger.error(JSON.stringify({'user': user,'message': `changeJobStatus ${err}`}))
             console.log(err);
             res.status(500).json({message: "Internal Server Error"});
         });
     })
     .catch( err => {
+        logger.error(JSON.stringify({'user': user,'message': `changeJobStatus ${err}`}))        
         console.log(err);
         return res.status(404).json({message: "Contractor not found"});        
     })    

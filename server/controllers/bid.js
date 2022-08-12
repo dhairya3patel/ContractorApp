@@ -18,11 +18,30 @@ const {
     v4: uuidv4,
   } = require('uuid');
 
+const { createLogger, format, transports } = require('winston');
+
+const logger = createLogger({
+    transports:
+        new transports.File({
+        filename: 'logs/server.log',
+        format:format.combine(
+            format.timestamp({format: 'MMM-DD-YYYY HH:mm:ss'}),
+            format.align(),
+            format.printf(info => {
+                const message = JSON.parse(info.message)
+                return `${info.level}: ${[info.timestamp]}: [${message.user}]: ${message.message}`
+            }),
+        )}),
+})
+
 const createBid = (req, res, next) => {
 
     const token = decodeToken(req);
 
     const user = token["id"]
+
+    logger.info(JSON.stringify({'user': user,'message':`createBid Request`}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
 
     Contractor.findOne({
         user: user, 
@@ -38,16 +57,19 @@ const createBid = (req, res, next) => {
                 contractor: contractor,
                 amount: req.body.amount
             }))
-            .then(() => {
+            .then((bid) => {
+                logger.info(JSON.stringify({'user': user,'message': `Bid Created ${bid}`}))
                 res.status(201).json({message: "Bid created"});
             })
             .catch(err => {
+                logger.error(JSON.stringify({'user': user,'message':`createBid ${err}`}));
                 console.log(err);
                 res.status(502).json({message: "error while creating Bid"});
             });    
         })
     })
     .catch( err => {
+        logger.error(JSON.stringify({'user': user,'message':`createBid ${err}`}));
         console.log(err);
         return res.status(404).json({message: "Contractor not found"});        
     })
@@ -60,6 +82,9 @@ const getBidsByUser = (req, res, next) => {
 
     const user = token["id"]
 
+    logger.info(JSON.stringify({'user': user,'message':`getBidsByUser Request`}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
+
     User.findOne({
         _id: user, 
     })
@@ -70,6 +95,7 @@ const getBidsByUser = (req, res, next) => {
                 status: req.body.status
             })
             .then((bids) => {
+                logger.info(JSON.stringify({'user': user,'message':`Bids: ${bids}`}))
                 res.status(200).json({
                     message: "Success",
                     bids: bids
@@ -77,6 +103,7 @@ const getBidsByUser = (req, res, next) => {
             })
             .catch(err => {
                 console.log(err);
+                logger.error(JSON.stringify({'user': user,'message':`getBidsByUser ${err}`}))
                 res.status(500).json({message: "error while getting Bids"});
             });            
         }
@@ -89,12 +116,14 @@ const getBidsByUser = (req, res, next) => {
                     contractor: contractor,
                 })
                 .then((bids) => {
+                    logger.info(JSON.stringify({'user': user,'message':`Bids: ${bids}`}))
                     res.status(200).json({
                         message: "Success",
                         bids: bids
                     })
                 })
                 .catch(err => {
+                    logger.error(JSON.stringify({'user': user,'message':`getBidsByUser ${err}`}))
                     console.log(err);
                     res.status(500).json({message: "error while getting Bids"});
                 });            
@@ -111,22 +140,28 @@ const getBidsByJob = (req, res, next) => {
 
     const user = token["id"]
 
+    logger.info(JSON.stringify({'user': user,'message':`getBidsByJob Request`}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
+
     Manager.findOne({
         user: user, 
     })
     .then( Manager => {
 
+        logger.info(JSON.stringify({'user': user,'message': ` Job ID: ${req.body.job}`}))
         return Bid.find({
             job: req.body.job
         })
         .populate('contractor')
         .then((Bid) => {
+            logger.info(JSON.stringify({'user': user,'message':`Bids: ${Bid}`}))
             res.status(200).json({
                 message: "Success",
                 bids: Bid
             })
         })
         .catch(err => {
+            logger.error(JSON.stringify({'user': user,'message':`getBidsByUser ${err}`}))
             console.log(err);
             res.status(500).json({message: "error while getting Bids"});
         });            
@@ -139,15 +174,22 @@ const acceptBid = (req, res, next) => {
 
     const user = token["id"]
 
+    logger.info(JSON.stringify({'user': user,'message': `acceptBid Request`}))
+    logger.info(JSON.stringify({'user': user,'message': JSON.stringify(req.body)}))
+
     Manager.findOne({
         user: user, 
     })
     .then( Manager => {
-
         Job.findOne({
             _id: req.body.job
         })
         .then( job => {
+
+            logger.info(JSON.stringify({'user': user,'message': `JOB ID: ${job}`}))
+            logger.info(JSON.stringify({'user': user,'message': `ASSIGNED TO: ${req.body.contractor}`}))
+            logger.info(JSON.stringify({'user': user,'message': `AMOUNT: ${req.body.amount}`}))
+
             job.status = "Assigned"
             job.assignedTo = req.body.contractor
             job.cost = req.body.amount
@@ -167,6 +209,7 @@ const acceptBid = (req, res, next) => {
                     })
                 })
                 .catch ( err => {
+                    logger.error(JSON.stringify({'user': user,'message': `AcceptBid ${err}`}))
                     res.status(500).json({
                         message: err
                     })
@@ -184,6 +227,9 @@ const getYourBid = (req, res, next) => {
 
     const user = token["id"]
 
+    logger.info(JSON.stringify({'user': user,'message': `GetYourBid Request`}))
+    logger.info(JSON.stringify({'user': user,'message': JSON.stringify(req.body)}))    
+
     Contractor.findOne({
         user: user, 
     })
@@ -194,12 +240,14 @@ const getYourBid = (req, res, next) => {
             job: req.body.job
         })
         .then( bid => {
-                    res.status(200).json({
-                        status: "200",
-                        bid: bid
-                    })
+            logger.info(JSON.stringify({'user': user,'message': `BID:  ${bid.bid}`}))
+            res.status(200).json({
+                status: "200",
+                bid: bid
+            })
         })
         .catch ( err => {
+            logger.error(JSON.stringify({'user': user,'message': `GetYourBid ${err}`}))
             res.status(500).json({
                 message: err
             })

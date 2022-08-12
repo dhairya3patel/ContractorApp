@@ -25,7 +25,8 @@ const logger = createLogger({
             format.timestamp({format: 'MMM-DD-YYYY HH:mm:ss'}),
             format.align(),
             format.printf(info => {
-                return `${info.level}: ${[info.timestamp]}: ${info.message}`
+                const message = JSON.parse(info.message)
+                return `${info.level}: ${[info.timestamp]}: [${message.user}]: ${message.message}`
             }),
         )}),
 })
@@ -33,8 +34,8 @@ const logger = createLogger({
   
 const signup = async(req, res, next) => {
     // checks if email already exists
-    logger.info(`SignUp Req`)
-    logger.info(req)
+    logger.info(JSON.stringify({'user': '','message':`SignUp Req`}))
+    logger.info(JSON.stringify({'user': '','message': JSON.stringify(req.body)}))
 
     User.findOne({
         email: req.body.email, 
@@ -42,13 +43,13 @@ const signup = async(req, res, next) => {
     .then(dbUser => {
         // console.log(dbUser);
         if (dbUser) {
-            logger.error(`User with email ${req.body.email} already exists`)
+            logger.error(JSON.stringify({'user': '','message':`User with email ${req.body.email} already exists`}))
             return res.status(409).json({message: "email already exists"});
         } else if (req.body.email && req.body.password) {
             // password hash
             bcrypt.hash(req.body.password, 12, (err, passwordHash) => {
                 if (err) {
-                    logger.error(`Password hash error: ${err}`)
+                    logger.error(JSON.stringify({'user': '','message':`Password hash error: ${err}`}))
                     return res.status(500).json({message: "couldnt hash the password"}); 
                 } else if (passwordHash) {
                     User.create(({
@@ -59,18 +60,18 @@ const signup = async(req, res, next) => {
                         role: req.body.role
                     }))
                     .then((newUser) => {
-                        logger.info(`User Creater: ${newUser}`)
+                        logger.info(JSON.stringify({'user': '','message':`User Created: ${newUser}`}))
                         if (req.body.role === "PM")
                             Manager.create(({
                                 _id: uuidv4(),
                                 user: newUser
                             }))
                             .then((manager) => {
-                                logger.info(`Manager Created: ${manager}`)
+                                logger.info(JSON.stringify({'user': '','message':`Manager Created: ${manager}`}))
                                 return res.status(201).json({message: "user created"});
                             })
                             .catch(err => {
-                                logger.error(`Error creating manager object: ${err}`);
+                                logger.error(JSON.stringify({'user': '','message':`Error creating manager object: ${err}`}));
                                 return res.status(502).json({message: "error while creating manager"});
                             })
                         else if (req.body.role === "Contractor"){
@@ -90,11 +91,11 @@ const signup = async(req, res, next) => {
                                 rating: req.body.rating
                             }))
                             .then((contractor) => {
-                                logger.info(`Contractor Created: ${contractor}`)
+                                logger.info(JSON.stringify({'user': '','message':`Contractor Created: ${contractor}`}))
                                 return res.status(201).json({message: "user created"});
                             })
                             .catch(err => {
-                                logger.error(`Error creating contractor object: ${err}`);
+                                logger.error(JSON.stringify({'user': '','message':`Error creating contractor object: ${err}`}));
                                 console.log(err);
                                 return res.status(502).json({message: "error while creating Contractor"});
                             })
@@ -104,7 +105,7 @@ const signup = async(req, res, next) => {
                         }        
                     })
                     .catch(err => {
-                        logger.error(`Error creating user object: ${err}`);
+                        logger.error(JSON.stringify({'user': '','message':`Error creating user object: ${err}`}));
                         console.log(err);
                         return res.status(502).json({message: "error while creating user"});
                     });
@@ -117,47 +118,48 @@ const signup = async(req, res, next) => {
         };
     })
     .catch(err => {
-        logger.error(`SignUp Error: ${err}`);
+        logger.error(JSON.stringify({'user': '','message':`SignUp Error: ${err}`}));
         console.log('error', err);
     });
 };
 
 const login = (req, res, next) => {
     // checks if email exists
-    logger.info(`Login Req`)
-    logger.info(JSON.stringify(req.body))
+    logger.info(JSON.stringify({'user': '','message':`Login Req`}))
+    logger.info(JSON.stringify({'user': '', 'message': JSON.stringify(req.body)}))
 
     User.findOne({
         email: req.body.email, 
     })
     .then(dbUser => {
         if (!dbUser) {
-            logger.error(`User ${req.body.email} not found`)
+            logger.error(JSON.stringify({'user': '','message':`User ${req.body.email} not found`}))
             return res.status(404).json({message: "user not found"});
         } else {
             // password hash
             bcrypt.compare(req.body.password, dbUser.password, (err, compareRes) => {
                 if (err) { // error while comparing
-                    logger.error(`password check error: ${err}`)
+                    logger.error(JSON.stringify({'user': '','message':`password check error: ${err}`}))
                     res.status(502).json({message: "error while checking user password"});
                 } else if (compareRes) { // password match
                     const token = jwt.sign({id: dbUser.id, role: dbUser.role}, 'secret', { expiresIn: '1h' });
-                    logger.info(`Login Token: ${token}`)
-                    logger.info(`Role: ${dbUser.role}`)
+                    logger.info(JSON.stringify({'user': dbUser._id,'message':`Status 200`}))                    
+                    logger.info(JSON.stringify({'user': dbUser._id,'message':`Login Token: ${token}`}))
+                    logger.info(JSON.stringify({'user': dbUser._id,'message':`Role: ${dbUser.role}`}))
                     res.status(200).json({
                         message: "user logged in",
                         "token": token,
-                        "role": dbUser.role 
+                        "role": dbUser.role
                     });
                 } else { // password doesnt match
-                    logger.error('Passwords dont match')
+                    logger.error(JSON.stringify({'user': '','message':'Passwords dont match'}))
                     res.status(401).json({message: "invalid credentials"});
                 };
             });
         };
     })
     .catch(err => {
-        logger.error(`Login error: ${err}`)
+        logger.error(JSON.stringify({'user': '','message':`Login error: ${err}`}))
         console.log('error', err);
     });
 };

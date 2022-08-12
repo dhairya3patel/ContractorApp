@@ -15,11 +15,30 @@ const {
     v4: uuidv4,
   } = require('uuid');
 
+  const { createLogger, format, transports } = require('winston');
+
+  const logger = createLogger({
+      transports:
+          new transports.File({
+          filename: 'logs/server.log',
+          format:format.combine(
+              format.timestamp({format: 'MMM-DD-YYYY HH:mm:ss'}),
+              format.align(),
+              format.printf(info => {
+                  const message = JSON.parse(info.message)
+                  return `${info.level}: ${[info.timestamp]}: [${message.user}]: ${message.message}`
+              }),
+          )}),
+  })  
+
 const getUserDetails = (req, res, next) => {
     const token = decodeToken(req);
 
     const user = token["id"]
-    // console.log(user)
+
+    logger.info(JSON.stringify({'user': user,'message':' getUserDetails Request'}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
+
     Contractor.findOne({
         user: user, 
     })
@@ -42,26 +61,31 @@ const getUserDetails = (req, res, next) => {
         })
 
     }).catch(err => {
+        logger.err(JSON.stringify({'user': user,'message': `getUserDetails ${err}`}))
         console.log(err);
         return res.status(404).json({message: "Contractor not found"});
     })
 }
 
 const getUsers = (req, res, next) => {
+
     const token = decodeToken(req);
-    // console.log(token)
     const user = token["id"]
+
+    logger.info(JSON.stringify({'user': user,'message':' getUsers Request'}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
 
     User.findOne({
         _id: user,
     })
     .then( user => {
-        // console.log(user)
+        logger.info(JSON.stringify({'user': user,'message':`Role ${req.body.role}`}))
         if (user.role == "Admin") {
             User.find({
                 role: req.body.role
             })
             .then( userList => {
+                logger.info(JSON.stringify({'user': user,'message':`UserList ${userList}`}))
                 return res.status(200).json({
                     message: "Success",
                     users: userList
@@ -75,6 +99,7 @@ const getUsers = (req, res, next) => {
         }
     })
     .catch(err => {
+        logger.err(JSON.stringify({'user': user,'message': `getUsers ${err}`}))
         console.log(err);
         return res.status(404).json({message: "User not found"});
     })
@@ -82,20 +107,22 @@ const getUsers = (req, res, next) => {
 
 const deleteUser = (req, res, next) => {
     const token = decodeToken(req);
-    // console.log(token)
     const user = token["id"]
+
+    logger.info(JSON.stringify({'user': user,'message':' deleteUsers Request'}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
 
     User.findOne({
         _id: user,
     })
     .then( user => {
-        // console.log(user)
         if (user.role == "Admin") {
             User.findOne({
                 _id: req.body.id
             })
             .delete()
             .then(() => {
+                logger.info(JSON.stringify({'user': user,'message': `User ${req.body.id} deleted`}))
                 return res.status(200).json({
                     message: "User Deleted"
                 })
@@ -113,6 +140,7 @@ const deleteUser = (req, res, next) => {
         }
     })
     .catch(err => {
+        logger.err(JSON.stringify({'user': user,'message': `deleteUsers ${err}`}))
         console.log(err);
         return res.status(404).json({message: "User not found"});
     })
