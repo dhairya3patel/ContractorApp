@@ -32,7 +32,7 @@ import CheckBox from '@react-native-community/checkbox'
 import ImageModal from 'react-native-image-modal';
 import axios from "axios";
 
-import API_URL from "../../../constants.js"
+import { API_URL } from "../../../constants.js"
 
 const ProfileScreen = ({ route, navigation}) => {
 

@@ -241,7 +241,7 @@ const getJobs = (req, res, next) => {
             user: user
         })
         .then(manager => {
-
+            console.log(manager)
             logger.info(JSON.stringify({'user': user,'message':`Manager identified: ${manager._id}`}))
             logger.info(JSON.stringify({'user': user,'message':`Job Status: ${req.body.status}`}))            
             switch(req.body.status){

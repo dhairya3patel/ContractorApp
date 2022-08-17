@@ -24,7 +24,7 @@ import CheckBox from '@react-native-community/checkbox'
 import axios from 'axios';
 import ListCard from "../../../components/Manager/ListCard";
 import AssignedCard from "../../../components/Manager/AssignedCard";
-import API_URL from "../../../constants";
+import { API_URL } from "../../../constants";
 
 const BidScreen = ({navigation}) => {
 

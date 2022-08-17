@@ -15,6 +15,26 @@ const {
     v4: uuidv4,
   } = require('uuid');
 
+const crypto = require('crypto')
+const algorithm = 'aes-256-cbc'
+
+const decryptData = (cipherText) => {
+    let cipher = cipherText.split('.');
+    // console.log(cipher)
+    let encryptedText = Buffer.from(cipher[0],'hex')
+    console.log(encryptedText)
+    let key = Buffer.from(cipher[1],'hex')
+    console.log(key);
+    let iv = Buffer.from(cipher[2],'hex')
+
+    let decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+    let decrypted = decipher.update(encryptedText,'hex','utf-8');
+    decrypted = Buffer.concat([decrypted, decipher.final('hex')]);
+    console.log(decrypted.toString());
+    return decrypted.toString();
+ 
+}
+
 const { createLogger, format, transports } = require('winston');
 
 const logger = createLogger({
@@ -132,6 +152,7 @@ const login = (req, res, next) => {
         email: req.body.email, 
     })
     .then(dbUser => {
+        // const password = decryptData(req.body.password)
         if (!dbUser) {
             logger.error(JSON.stringify({'user': '','message':`User ${req.body.email} not found`}))
             return res.status(404).json({message: "user not found"});

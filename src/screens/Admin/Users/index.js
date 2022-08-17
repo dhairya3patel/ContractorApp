@@ -24,7 +24,7 @@ import CheckBox from '@react-native-community/checkbox'
 import axios from 'axios';
 
 import UserCard from "../../../components/Admin/UserCard.js";
-import API_URL from "../../../constants.js";
+import { API_URL } from "../../../constants.js";
 
 const UsersScreen = ({navigation}) => {
 

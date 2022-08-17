@@ -7,7 +7,8 @@ const ListCard = ({item, viewItem}) => {
   const windowDate = new Date(date.getTime() + item.bidWindow * 60000)
   // console.log(new Date())
   // console.log(windowDate)
-  const diff = Math.abs(windowDate - new Date());
+  const now = new Date()
+  const diff = Math.abs(windowDate - now);
   const remTime = Math.round((diff / 1000) / 60)
   // console.log(remTime)
   return (

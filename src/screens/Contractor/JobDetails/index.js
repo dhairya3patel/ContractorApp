@@ -33,7 +33,7 @@ import Modal from "react-native-modal";
 import axios from "axios";
 // import getImage from '../../../server/files/images'
 
-import API_URL from "../../../constants";
+import { API_URL } from "../../../constants.js";
 
 const JobDetails = ({route, navigation}) => {
 

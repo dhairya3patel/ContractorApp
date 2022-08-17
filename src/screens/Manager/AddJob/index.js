@@ -38,7 +38,7 @@ import base64 from 'react-native-base64'
 import RNFS from 'react-native-fs'
 import { Buffer } from "safe-buffer";
 
-import API_URL from "../../../constants.js";
+import { API_URL } from "../../../constants.js";
 
 var photos = [];
 

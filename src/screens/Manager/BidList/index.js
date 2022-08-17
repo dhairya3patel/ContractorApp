@@ -23,7 +23,7 @@ import Modal from "react-native-modal";
 import CheckBox from '@react-native-community/checkbox'
 import axios from 'axios';
 
-import API_URL from "../../../constants";
+import { API_URL } from "../../../constants";
 import BidCard from "../../../components/Manager/BidCard";
 
 const BidList = ({route, navigation}) => {

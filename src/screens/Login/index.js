@@ -17,10 +17,12 @@ import Modal from "react-native-modal";
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+import BcryptReactNative from 'bcrypt-react-native';
+
 import { useTogglePasswordVisibility } from "../../hooks/TogglePassword";
 import { useLoginButton } from "../../hooks/HandleLogin";
-import API_URL from "../../constants.js"
-
+import {API_URL} from "../../constants.js"
+import { SALT } from "../../constants.js";
 
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState("");
@@ -39,12 +41,26 @@ const LoginScreen = ({navigation}) => {
 
   }
 
+  const encryptData = (plainText) => {
+
+    Aes.randomKey(32).then(KEY => {
+      console.log(KEY)
+      let key = KEY.slice(0, 32)
+      console.log('key', key)
+      let iv = KEY.slice(32,64)
+      console.log(iv)
+      return Aes.encrypt(plainText, key, iv, 'aes-256-cbc').then(cipher => (
+        cipher + '.' + key + '.' + iv
+      ))
+    })   
+  }
   // const validatePassword = (password) => {
 
   //   const expression = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
 
   //   return expression.test(String(password))
   // }
+  // let [cipher, setCipher] = useState('')
 
   const storeData = async (key, value) => {
     try {
@@ -54,7 +70,7 @@ const LoginScreen = ({navigation}) => {
     }
   }
 
-  const handleLogin = (event) => {
+  const handleLogin = async(event) => {
 
     event.preventDefault();
 
@@ -64,39 +80,64 @@ const LoginScreen = ({navigation}) => {
     else if (password.length < 8)
       Alert.alert("Please enter a valid password");
 
-    else
-      console.log(`${API_URL}/login`)
-      axios({
-        method: 'post',
-        url: `${API_URL}/login`,
-        data: {
-          email: email,
-          password: password
-        },
-        timeout: 4000,
-      })
-      .then( res => {
-        // console.log(res);
-        if (res.status == 200) {
-
-          axios.defaults.headers.common["Authorization"] = `${res.data.token}`;
-          storeData('token',res.data.token)
-
-          if (res.data.role === 'Contractor')
-            navigation.navigate("Jobs");
-          else if (res.data.role === 'Manager')
-            navigation.navigate("AddJob");
-          else
-            navigation.navigate("Admin")
-        // await AsyncStorage.setItem('token', value)          
-
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        alert(error);            
-      })
+    else {
+      // encryptData(
+      //   password
+      // )
+      // .then( cipher => {
+      //   console.log(cipher)
+      // }).catch(err => {
+      //   console.log(err)
+      // })
+      // Aes.randomKey(64).then(KEY => {
+      //   console.log(KEY)
+      //   let key = KEY.slice(0, 64)
+      //   console.log('key', key)
+      //   let iv = KEY.slice(64,96)
+      //   console.log(iv)
+      //   Aes.encrypt(password, key, iv, 'aes-256-cbc').then(cipherText => {
+      //     let temp = cipherText.toString('hex');
+      //     console.log(temp)
+      //     setCipher(temp + '.' + key + '.' + iv);
+      //     console.log(cipher)
+        // let salt = await BcryptReactNative.getSalt(12);
+        let hash = await BcryptReactNative.hash(SALT, password.toString());
+        // console.log(hash)
+        axios({
+          method: 'post',
+          url: `${API_URL}/login`,
+          data: {
+            email: email,
+            password: hash
+          },
+          timeout: 4000,
+        })
+        .then( res => {
+          // console.log(res);
+          if (res.status == 200) {
+  
+            axios.defaults.headers.common["Authorization"] = `${res.data.token}`;
+            storeData('token',res.data.token)
+  
+            if (res.data.role === 'Contractor')
+              navigation.navigate("Jobs");
+            else if (res.data.role === 'Manager')
+              navigation.navigate("AddJob");
+            else
+              navigation.navigate("Admin")
+          // await AsyncStorage.setItem('token', value)          
+  
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          alert(error);            
+        })  
+    //   })
+    // })
+    }
   }
+
 
   // const source = require("../../../assets/data/docs/Work_Authorization_Agreement.pdf")
 

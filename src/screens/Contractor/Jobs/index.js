@@ -25,7 +25,7 @@ import axios from 'axios';
 
 import ListCard from "../../../components/Contractor/ListCard";
 import BidCard from "../../../components/Contractor/BidCard";
-import API_URL from "../../../constants.js";
+import { API_URL } from "../../../constants.js";
 
 const JobsScreen = ({navigation}) => {
 

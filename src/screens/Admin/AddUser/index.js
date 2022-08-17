@@ -37,8 +37,11 @@ import uuid from 'react-native-uuid';
 import base64 from 'react-native-base64'
 import RNFS from 'react-native-fs'
 import { Buffer } from "safe-buffer";
+import BcryptReactNative from 'bcrypt-react-native';
 
-import API_URL from "../../../constants.js";
+
+import { API_URL } from "../../../constants.js";
+import { SALT } from "../../../constants.js";
 
 var photos = [];
 
@@ -73,7 +76,10 @@ const AddUserScreen = ({ route, navigation}) => {
     formState: {errors, isValid}
   } = useForm({mode: 'onBlur'})
 
-    const onSubmit = data => {
+    const onSubmit = async(data) => {
+      
+      let hash = await BcryptReactNative.hash(SALT, data.password.toString());
+      data.password = hash
 
       axios({
         method: 'post',
