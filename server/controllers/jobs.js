@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import Job from '../models/job.js';
+import User from "../models/user.js";
 import Manager from '../models/manager.js';
 import Contractor from '../models/contractor.js';
 import Image from '../models/image.js';
@@ -241,7 +242,7 @@ const getJobs = (req, res, next) => {
             user: user
         })
         .then(manager => {
-            console.log(manager)
+            // console.log(manager)
             logger.info(JSON.stringify({'user': user,'message':`Manager identified: ${manager._id}`}))
             logger.info(JSON.stringify({'user': user,'message':`Job Status: ${req.body.status}`}))            
             switch(req.body.status){
@@ -321,7 +322,95 @@ const getJobs = (req, res, next) => {
                     })
             }            
         })
-    })    
+        .catch( err => {
+            logger.info(JSON.stringify({'user': user,'message':`Manager not found getJobs, Checking for Admin`}))
+            User.findOne({
+                _id: user,
+                role: "Admin"
+            })
+            .then(manager => {
+                // console.log(manager)
+                logger.info(JSON.stringify({'user': user,'message':`Admin identified: ${manager._id}`}))
+                logger.info(JSON.stringify({'user': user,'message':`Job Status: ${req.body.status}`}))            
+                switch(req.body.status){
+                    case 'Bids':
+                        return Job.find({
+                            'status': "Bid Complete",
+                        })
+                        .then((jobList) => {
+                            // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
+                            res.status(200).json({
+                                message: "Success",
+                                jobs: jobList
+                            });
+                        })
+                        .catch(err => {
+                            logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
+                            console.log(err);
+                            res.status(500).json({message: "error while getting Jobs"});
+                        });
+    
+                    case 'Assigned':
+                        return Job.find({
+                            status: req.body.status,
+                        })
+                        .populate('assignedTo')
+                        .then((jobList) => {
+                            // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
+                            res.status(200).json({
+                                message: "Success",
+                                jobs: jobList
+                            });
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
+                            res.status(500).json({message: "error while getting Jobs"});
+                        });
+    
+                        case 'Active':
+                            return Job.find({
+                                status: req.body.status,
+                            })
+                            .then((jobList) => {
+                                // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
+                                res.status(200).json({
+                                    message: "Success",
+                                    jobs: jobList
+                                });
+                            })
+                            .catch(err => {
+                                logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
+                                console.log(err);
+                                res.status(500).json({message: "error while getting Jobs"});
+                            });                    
+    
+                    case 'Completed':
+                        return Job.find({
+                            status: req.body.status,
+                        })
+                        .then((jobList) => {
+                            // logger.info(JSON.stringify({'user': user,'message':JSON.stringify(jobList)}))
+                            res.status(200).json({
+                                message: "Success",
+                                jobs: jobList
+                            });
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            logger.error(JSON.stringify({'user': user,'message':`Error getJob ${err}`}))
+                            res.status(500).json({message: "error while getting Jobs"});
+                        });
+                    
+                    default:
+                        return res.status(404).json({
+                            message:"Status not Found",
+                            jobs: ""
+                        })
+                }            
+            })
+        })        
+    })   
 
 }
 

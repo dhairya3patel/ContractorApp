@@ -81,7 +81,7 @@ const signup = async(req, res, next) => {
                     }))
                     .then((newUser) => {
                         logger.info(JSON.stringify({'user': '','message':`User Created: ${newUser}`}))
-                        if (req.body.role === "PM")
+                        if (req.body.role === "Manager")
                             Manager.create(({
                                 _id: uuidv4(),
                                 user: newUser
