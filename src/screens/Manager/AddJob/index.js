@@ -74,6 +74,10 @@ const AddJobScreen = ({ route, navigation}) => {
   } = useForm({mode: 'onBlur'})
 
     const onSubmit = data => {
+      // const now = new Date().getTime()
+      // const bidEnd = new Date(now + data.bidWindow * 60000)
+      // console.log(bidEnd)
+      // data['bidEnd'] = bidEnd
       data["pictures"] = photos
       data["date"] = date
       console.log(data);
@@ -414,7 +418,7 @@ const AddJobScreen = ({ route, navigation}) => {
                     <View style={styles.inputView}>
                       <Controller
                         control={control}        
-                        name="bidTime"
+                        name="bidWindow"
                         render={({field: {onChange, value, onBlur}}) => (
                           <TextInput
                               keyboardType="numeric"

@@ -69,6 +69,10 @@ let jobSchema = new Schema({
         type: Number,
         default: 120,
     },
+    bidEnd: {
+        type: Date,
+        default: Date.now,
+    },
     bidLow: {
         type: Number ,
         default: 0

@@ -58,6 +58,9 @@ const createJob = (req, res, next) => {
             "_id" : {"$in" : pictures}
         })
         .then( images => {
+            const now = new Date().getTime()
+            const bidEnd = new Date(now + req.body.bidWindow * 60000)
+            // console.log(now)
             Job.create(({
                 _id: uuidv4(),
                 po: req.body.po,
@@ -75,6 +78,7 @@ const createJob = (req, res, next) => {
                 bidLow: req.body.bidLow,
                 bidHigh: req.body.bidHigh,
                 bidWindow: req.body.bidWindow,
+                bidEnd: bidEnd,
                 // assignedTo: req.body.assignedTo,
                 // status: req.body.status,
                 estimatedHours: req.body.estimatedHours,

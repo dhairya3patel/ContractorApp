@@ -4,7 +4,7 @@ import {TouchableOpacity, View, Image, Text, StyleSheet} from 'react-native';
 const ListCard = ({item, viewItem}) => {
   const date = new Date(item.dateTime)
   const dateString = date.toLocaleDateString("en-us")
-  const windowDate = new Date(date.getTime() + item.bidWindow * 60000)
+  const windowDate = new Date(item.bidEnd)
   // console.log(new Date())
   // console.log(windowDate)
   const now = new Date()
