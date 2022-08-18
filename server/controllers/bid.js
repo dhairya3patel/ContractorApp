@@ -4,12 +4,14 @@ import jwt from 'jsonwebtoken';
 import Bid from '../models/bid.js';
 import Manager from '../models/manager.js';
 import Contractor from '../models/contractor.js';
+import User from '../models/user.js';
 import { decodeToken } from '../middleware/auth.js';
 import Job from '../models/job.js';
 import AcceptedBid from '../models/acceptedBids.js';
 
 import {createRequire} from "module"
 import contractor from '../models/contractor.js';
+import { sendJobAssignedMail } from './mail.js';
 
 const require = createRequire(import.meta.url);
 
@@ -203,6 +205,13 @@ const acceptBid = (req, res, next) => {
                     bid: req.body.bid
                 })
                 .then( () => {
+                    Contractor.findOne({
+                        _id: req.body.contractor
+                    })
+                    .populate('user')
+                    .then( toUser => {
+                        sendJobAssignedMail(toUser.user, job)
+                    })
                     res.status(201).json({
                         status: "201",
                         message: "Job Assigned"

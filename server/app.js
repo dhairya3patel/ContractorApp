@@ -1,7 +1,7 @@
 import express from 'express';
 import router from './routes/routes.js';
 import {createRequire} from "module";
-import ATLAS_URI from "./constants.js"
+import {ATLAS_URI} from "./constants.js"
 
 
 const require = createRequire(import.meta.url);
