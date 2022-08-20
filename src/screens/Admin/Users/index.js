@@ -58,7 +58,9 @@ const UsersScreen = ({navigation}) => {
         method: 'post',
         url: `${API_URL}/deleteuser`,
         data: {
-          "id": item._id
+          "id": item.user._id,
+          "childId": item._id,
+          "role": item.user.role
         },
         timeout: 4000,
       })
@@ -82,8 +84,50 @@ const UsersScreen = ({navigation}) => {
   const [textColor, setTextColor] = useState('#000');
   const [value, setValue] = useState('Admin');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [services, setServices] = useState([]);
 
   const [dataSource, setDataSource] = useState("");
+
+  const [isContractorModalVisible, setIsContractorModalVisible] = React.useState(false);
+  const [isManagerModalVisible, setIsManagerModalVisible] = React.useState(false);
+  const handleContractorModal = () => setIsContractorModalVisible(() => !isContractorModalVisible);
+  const handleManagerModal = () => setIsManagerModalVisible(() => !isManagerModalVisible);
+
+  const [contractor, setContractor] = useState({
+    _id: "",
+    name: "",
+    user: {
+        _id: "",
+        name: "",
+        email: "",
+        role: ""
+    },
+    services: [],
+    contact: "",
+    serviceLocation: [],
+    authPersonnel: "",
+    logo: "",
+    rating: {
+        avg: "",
+        jobsCompleted: "",
+        ongoing: "",
+        availability: "",
+        service: "",
+        quality: ""
+    }
+  })
+
+  const [manager, setManager] = useState({
+    contact: "",
+    _id: "",
+    user: {
+        _id: "",
+        name: "",
+        email: "",
+        password: "",
+        role: "",
+    },
+  })
 
   useEffect (() => {
 
@@ -91,8 +135,6 @@ const UsersScreen = ({navigation}) => {
     
   },[])
 
-
-  const handleModal = () => setIsModalVisible(() => !isModalVisible);  
 
   const ItemSeparator = () => <View style={{
     height: 2,
@@ -118,63 +160,155 @@ const UsersScreen = ({navigation}) => {
   };
 
   const renderJob = ({item}) => {
-    var visible = 'flex'
-    if (value == 'Admin')
-      visible = 'none'
-    return <UserCard item={item} func={deleteItem} visible={visible}/>;
+    var disabled = false;
+    if (value == 'Admin') {
+      disabled = true
+      item.user = item;
+    }
+    return <UserCard item={item} viewItem={viewItem} disabled={disabled}/>;
+  };
+
+  const viewItem = item => {
+    if (item.user.role == "Manager") {
+      setManager(item)
+      handleManagerModal();  
+    }
+    else if (item.user.role == 'Contractor') {
+      setContractor(item)
+      var serv = []
+      for (var i = 0; i < item.services.length - 1; i++) {
+        serv.push(item.services[i].name + '\n')
+      }
+      serv.push(item.services[i].name)
+      setServices(serv)
+      handleContractorModal();        
+    }
+
   };
 
   return (
     <SafeAreaView>
       <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity>
-                <Text style = {styles.leftHeaderButton}>Settings</Text>
-            </TouchableOpacity>
-            <Text style = {styles.centerHeaderText}>Users</Text>
-          </View>
-
-          <View style={styles.segmentContainer}>
-            <SegmentedControl
-              style= {{height: 50}}
-              values={['Admin', 'Manager', 'Contractor']}
-              selectedIndex={selectedIndex}
-              onChange={_onChange}
-              onValueChange={_onValueChange}
-            />
+        <View style={styles.header}>
+          <TouchableOpacity>
+              <Text style = {styles.leftHeaderButton}>Settings</Text>
+          </TouchableOpacity>
+          <Text style = {styles.centerHeaderText}>Users</Text>
         </View>
-        {/* <View style={{flex: 1}}> */}
-          <FlatList
-              ref={(ref) => { setFlatListRef(ref); }}
-              data={dataSource}
-              renderItem={renderJob}
-              // contentContainerStyle={{flex: 1}}
-              keyExtractor={item => item._id.toString()}
-              ItemSeparatorComponent={ItemSeparator}
-              
-              ListFooterComponent={
-                <>
-                  <View style={{
-                      height: 2,
-                      backgroundColor: "rgba(0,0,0,0.2)",
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                    />                
-                  <View style={{height: 360}}>
-                    {/* <Text style={styles.subtitle}>That's it for now!</Text> */}
-                  </View>
-                </>
-              }
-              removeClippedSubviews={true}
-              initialNumToRender={5}
-              // refreshing={refreshing}
-              // onRefresh={useRefresh}       
-            />
 
-        <Pressable style={styles.button} onPress={onPressFunction}>
-          <Text style={styles.arrow}>^</Text>
-        </Pressable>            
+        <View style={styles.segmentContainer}>
+          <SegmentedControl
+            style= {{height: 50}}
+            values={['Admin', 'Manager', 'Contractor']}
+            selectedIndex={selectedIndex}
+            onChange={_onChange}
+            onValueChange={_onValueChange}
+          />
+        </View>
+        <Modal isVisible={isContractorModalVisible}>
+          <View style={styles.modalWrapper}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={handleContractorModal}>
+                <Icon name={"times"} color={"#334A65"} size={20} style={{margin: 10, marginTop: 15, marginRight: "90%",}} />
+              </TouchableOpacity>            
+            </View>
+            <View style={styles.modalDetails}>
+              <View style={styles.modalSection}>
+                <Text style={styles.modalTitle}>Company:</Text>
+                <Text style={styles.subtitle}>{contractor.name}</Text>
+              </View>
+              <View style={styles.modalSection}>
+                <Text style={styles.modalTitle}>E-mail:</Text>
+                <Text style={styles.subtitle}>{contractor.user.email}</Text>
+              </View>
+              <View style={styles.modalSection}>
+                <Text style={styles.modalTitle}>Contact:</Text>
+                <Text style={styles.subtitle}>{contractor.contact}</Text>
+              </View>
+              <View style={styles.modalSection}>
+                <Text style={styles.modalTitle}>Services:</Text>
+                <Text style={styles.subtitle}>{services}</Text>
+              </View>
+              <View style={styles.modalSection}>
+                <Text style={styles.modalTitle}>Service Location:</Text>
+                <Text style={styles.subtitle}>{contractor.serviceLocation}</Text>
+              </View>
+              <View style={styles.modalSection}>
+                <Text style={styles.modalTitle}>Rating:</Text>
+              </View>
+              <View style={styles.modalSection}>
+                <View style ={styles.leftModal}>
+                <Text style={styles.subtitle}>Average: {contractor.rating.avg}</Text>
+                <Text style={styles.subtitle}>Completed: {contractor.rating.jobsCompleted}</Text>
+                <Text style={styles.subtitle}>Ongoing: {contractor.rating.ongoing}</Text>
+                </View>
+                <View style ={styles.rightModal}>
+                <Text style={styles.subtitle}>QoS: {contractor.rating.quality}</Text>
+                <Text style={styles.subtitle}>Availability: {contractor.rating.availability}</Text>                
+                 </View>
+              </View>              
+            </View>
+            <TouchableOpacity style={styles.loginBtn} onPress={() => deleteItem(contractor)} >
+              <Text style={styles.loginText}>Delete Contractor</Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity style={styles.loginBtn}>
+              <Text style={styles.loginText}>Rate Contractor</Text>
+            </TouchableOpacity>                           */}
+          </View>
+        </Modal>
+        <Modal isVisible={isManagerModalVisible}>
+          <View style={styles.modalWrapper}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={handleManagerModal}>
+                <Icon name={"times"} color={"#334A65"} size={20} style={{margin: 10, marginTop: 15, marginRight: "90%",}} />
+              </TouchableOpacity>            
+            </View>
+            <View style={styles.modalDetails}>
+              <View style={styles.modalSection}>
+                <Text style={styles.modalTitle}>Name:</Text>
+                <Text style={styles.subtitle}>{manager.user.name}</Text>
+              </View>
+              <View style={styles.modalSection}>
+                <Text style={styles.modalTitle}>Contact:</Text>
+                <Text style={styles.subtitle}>{manager.contact}</Text>
+              </View>
+            </View>
+            <TouchableOpacity style={styles.loginBtn} onPress={() => deleteItem(manager)} >
+              <Text style={styles.loginText}>Delete Manager</Text>
+            </TouchableOpacity>              
+          </View>
+        </Modal>        
+        <FlatList
+          ref={(ref) => { setFlatListRef(ref); }}
+          data={dataSource}
+          renderItem={renderJob}
+          // contentContainerStyle={{flex: 1}}
+          keyExtractor={item => item._id.toString()}
+          ItemSeparatorComponent={ItemSeparator}
+          
+          ListFooterComponent={
+            <>
+              <View style={{
+                  height: 2,
+                  backgroundColor: "rgba(0,0,0,0.2)",
+                  marginLeft: 10,
+                  marginRight: 10,
+                }}
+                />                
+              <View style={{height: 360}}>
+                {/* <Text style={styles.subtitle}>That's it for now!</Text> */}
+              </View>
+            </>
+          }
+          removeClippedSubviews={true}
+          initialNumToRender={5}
+          // refreshing={refreshing}
+          // onRefresh={useRefresh}       
+        />
+
+      <Pressable style={styles.button} onPress={onPressFunction}>
+        <Text style={styles.arrow}>^</Text>
+      </Pressable>            
       </View>
     </SafeAreaView>
   );
@@ -414,6 +548,50 @@ const styles = StyleSheet.create({
     // bottom: 0,
     // textAlign: "center"
   },
+
+  modalWrapper: {
+    backgroundColor: "whitesmoke",
+    height: "auto",
+    borderRadius: 25,
+  },
+
+  modalDetails: {
+    margin: 10
+  },
+
+  modalSection: {
+    flexDirection: 'row'
+  },  
+
+  modalTitle: {
+    margin: 10,
+    marginLeft: 5,
+    fontWeight: "bold",
+    color: "black",
+    fontFamily: 'Inter',
+    fontStyle: 'normal',
+    fontSize: 20,
+    lineHeight: 25,
+    color: "#334A65"
+  },
+
+  modalSubtitle: {
+    // fontWeight: "bold",
+    // color: "black",
+    color: "rgba(0,0,0,0.3)",
+    marginTop: 5,
+    fontFamily: 'Inter',
+    fontStyle: 'normal',
+    fontSize: 20,
+    lineHeight: 25,
+    alignSelf: "center",
+  },
+  leftModal: {
+    width: '50%'
+  },
+  rightModal: {
+    width: '50%'
+  }
 
 });
 

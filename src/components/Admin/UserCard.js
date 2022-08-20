@@ -2,24 +2,21 @@ import React from 'react';
 import {TouchableOpacity, View, Image, Text, StyleSheet, Pressable} from 'react-native';
 import Icon from "react-native-vector-icons/dist/FontAwesome5"
 
-const UserCard = ({item, func, visible}) => {
+const UserCard = ({item, viewItem, disabled}) => {
 
   return (
+    <TouchableOpacity
+    onPress={() => viewItem(item)} 
+    disabled={disabled}
+    >
       <View style={styles.wrapper}>
         <View style={styles.leftDetails}>
-          <Text style={styles.title}>{item.name}</Text>
-          <Text style={styles.subtitle}>{item.email}</Text>
-        </View>
-        <View 
-          style={{
-            display: visible,
-          }}
-        >
-            <TouchableOpacity onPress={(func(item))} style={styles.deleteButton}>
-                <Icon name={"minus"} color={"#ffffff"} size={20} style={{margin: 10, marginTop: 10}} />                
-            </TouchableOpacity>
-        </View>
+          <Text style={styles.title}>{item.user.name}</Text>
+          <Text style={styles.subtitle}>{item.user.email}</Text>
+        </View>        
       </View>
+    </TouchableOpacity>
+
   );
 };
 

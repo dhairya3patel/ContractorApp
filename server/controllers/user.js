@@ -61,7 +61,7 @@ const getUserDetails = (req, res, next) => {
         })
 
     }).catch(err => {
-        logger.err(JSON.stringify({'user': user,'message': `getUserDetails ${err}`}))
+        logger.error(JSON.stringify({'user': user,'message': `getUserDetails ${err}`}))
         console.log(err);
         return res.status(404).json({message: "Contractor not found"});
     })
@@ -81,16 +81,41 @@ const getUsers = (req, res, next) => {
     .then( user => {
         logger.info(JSON.stringify({'user': user,'message':`Role ${req.body.role}`}))
         if (user.role == "Admin") {
-            User.find({
-                role: req.body.role
-            })
-            .then( userList => {
-                logger.info(JSON.stringify({'user': user,'message':`UserList ${userList}`}))
-                return res.status(200).json({
-                    message: "Success",
-                    users: userList
+
+            if (req.body.role == 'Admin') {
+                User.find({
+                    role: req.body.role
                 })
-            })
+                .then( userList => {
+                    logger.info(JSON.stringify({'user': user,'message':`UserList ${userList}`}))
+                    return res.status(200).json({
+                        message: "Success",
+                        users: userList
+                    })
+                })
+            }
+            else if (req.body.role == 'Manager') {
+                Manager.find()
+                .populate('user','-password')
+                .then(managerList => {
+                    logger.info(JSON.stringify({'user': user,'message':`ManagerList ${managerList}`}))
+                    return res.status(200).json({
+                        message: "Success",
+                        users: managerList
+                    })
+                })
+            }
+            else {
+                Contractor.find()
+                .populate('user', '-password')
+                .then(contractorList => {
+                    logger.info(JSON.stringify({'user': user,'message':`ContractorList ${contractorList}`}))
+                    return res.status(200).json({
+                        message: "Success",
+                        users: contractorList
+                    })
+                })                
+            }
         }
         else {
             return res.status(401).json({
@@ -99,7 +124,7 @@ const getUsers = (req, res, next) => {
         }
     })
     .catch(err => {
-        logger.err(JSON.stringify({'user': user,'message': `getUsers ${err}`}))
+        logger.error(JSON.stringify({'user': user,'message': `getUsers ERROR: ${err}`}))
         console.log(err);
         return res.status(404).json({message: "User not found"});
     })
@@ -117,21 +142,58 @@ const deleteUser = (req, res, next) => {
     })
     .then( user => {
         if (user.role == "Admin") {
-            User.findOne({
-                _id: req.body.id
-            })
-            .delete()
-            .then(() => {
-                logger.info(JSON.stringify({'user': user,'message': `User ${req.body.id} deleted`}))
-                return res.status(200).json({
-                    message: "User Deleted"
+            if (req.body.role == 'Manager') {
+                Manager.deleteOne({
+                    _id: req.body.childId
                 })
-            })
-            .catch(err => {
-                return res.status(404).json({
-                    message: "User not Found"
-                })                
-            })
+                .then(() => {
+                    User.deleteOne({
+                        _id: req.body.id
+                    })
+                    .then(() => {
+                        logger.info(JSON.stringify({'user': user,'message': `User ${req.body.id} deleted`}))
+                        return res.status(200).json({
+                            message: "User Deleted"
+                        })
+                    })
+                    .catch(err => {
+                        return res.status(404).json({
+                            message: "User not Found"
+                        })                
+                    })                    
+                })
+                .catch(err => {
+                    return res.status(404).json({
+                        message: "Manager not Found"
+                    })                
+                })
+            }
+            else if (req.body.role == 'Contractor') {
+                Contractor.deleteOne({
+                    _id: req.body.childId
+                })
+                .then(() => {
+                    User.deleteOne({
+                        _id: req.body.id
+                    })
+                    .then(() => {
+                        logger.info(JSON.stringify({'user': user,'message': `User ${req.body.id} deleted`}))
+                        return res.status(200).json({
+                            message: "User Deleted"
+                        })
+                    })
+                    .catch(err => {
+                        return res.status(404).json({
+                            message: "User not Found"
+                        })                
+                    })                    
+                })
+                .catch(err => {
+                    return res.status(404).json({
+                        message: "Contractor not Found"
+                    })                
+                })
+            }
         }
         else {
             return res.status(401).json({
@@ -140,7 +202,7 @@ const deleteUser = (req, res, next) => {
         }
     })
     .catch(err => {
-        logger.err(JSON.stringify({'user': user,'message': `deleteUsers ${err}`}))
+        logger.error(JSON.stringify({'user': user,'message': `deleteUsers ${err}`}))
         console.log(err);
         return res.status(404).json({message: "User not found"});
     })

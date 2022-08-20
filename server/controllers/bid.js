@@ -188,7 +188,7 @@ const acceptBid = (req, res, next) => {
         })
         .then( job => {
 
-            logger.info(JSON.stringify({'user': user,'message': `JOB ID: ${job}`}))
+            logger.info(JSON.stringify({'user': user,'message': `JOB ID: ${job._id}`}))
             logger.info(JSON.stringify({'user': user,'message': `ASSIGNED TO: ${req.body.contractor}`}))
             logger.info(JSON.stringify({'user': user,'message': `AMOUNT: ${req.body.amount}`}))
 

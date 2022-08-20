@@ -13,6 +13,10 @@ let managerSchema = new Schema({
     type: String,
     ref: User
   },
+  contact: {
+    type: String,
+    default: "0000000000"
+  },
 }, {
     collection: 'manager'
   })
