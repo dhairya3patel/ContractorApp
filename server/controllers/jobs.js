@@ -11,7 +11,7 @@ import Image from '../models/image.js';
 import Bid from '../models/bid.js';
 import { decodeToken } from '../middleware/auth.js';
 import contractor from "../models/contractor.js";
-
+import { MAPS_KEY, MAPS_URL } from "../constants.js";
 
 
 const require = createRequire(import.meta.url);
@@ -22,6 +22,8 @@ const {
   } = require('uuid');
 
 const { createLogger, format, transports } = require('winston');
+
+const request = require('request')
 
 const logger = createLogger({
     transports:
@@ -60,50 +62,63 @@ const createJob = (req, res, next) => {
         .then( images => {
             const now = new Date().getTime()
             const bidEnd = new Date(now + req.body.bidWindow * 60000)
-            // console.log(now)
-            Job.create(({
-                _id: uuidv4(),
-                po: req.body.po,
-                // clientEmail: req.body.Email,
-                // location: req.body.location,
-                address1: req.body.address1,
-                address2: req.body.address2,
-                city: req.body.city,
-                state: req.body.state,
-                zip: req.body.zip,
-                jobType: req.body.jobType,
-                pictures: images,
-                // dateTime: req.body.dateTime,
-                dateOfCompletion: req.body.date,
-                bidLow: req.body.bidLow,
-                bidHigh: req.body.bidHigh,
-                bidWindow: req.body.bidWindow,
-                bidEnd: bidEnd,
-                // assignedTo: req.body.assignedTo,
-                // status: req.body.status,
-                estimatedHours: req.body.estimatedHours,
-                equipment: req.body.equipment,
-                notes: req.body.notes,
-                createdBy: manager
-            }))
-            .then(() => {
-                Image.find({
-                    "_id" : {"$in" : pictures}
-                })
-                .deleteMany()
-                .then(() => {
-                    logger.info(JSON.stringify({'user': user,'message':'Job Created'}))
-                    return res.status(201).json({message: "Job created"});
-                })               
+            let options = {
+                provider: 'openstreetmap'
+              };
+               
+            let url = `${MAPS_URL}${req.body.address1}, ${req.body.address2}, ${req.body.city}, ${req.body.state} - ${req.body.zip}&key=${MAPS_KEY}`
+            request(url, function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    const resp = body
+                    const coords = JSON.parse(resp).results[0].geometry.location
+                    Job.create(({
+                        _id: uuidv4(),
+                        po: req.body.po,
+                        // clientEmail: req.body.Email,
+                        // location: req.body.location,
+                        address1: req.body.address1,
+                        address2: req.body.address2,
+                        city: req.body.city,
+                        state: req.body.state,
+                        zip: req.body.zip,
+                        jobType: req.body.jobType,
+                        pictures: images,
+                        // dateTime: req.body.dateTime,
+                        dateOfCompletion: req.body.date,
+                        bidLow: req.body.bidLow,
+                        bidHigh: req.body.bidHigh,
+                        bidWindow: req.body.bidWindow,
+                        bidEnd: bidEnd,
+                        // assignedTo: req.body.assignedTo,
+                        // status: req.body.status,
+                        estimatedHours: req.body.estimatedHours,
+                        equipment: req.body.equipment,
+                        notes: req.body.notes,
+                        createdBy: manager,
+                        latitude: coords.lat,
+                        longitude: coords.lng
+                    }))
+                    .then(() => {
+                        Image.find({
+                            "_id" : {"$in" : pictures}
+                        })
+                        .deleteMany()
+                        .then(() => {
+                            logger.info(JSON.stringify({'user': user,'message':'Job Created'}))
+                            return res.status(201).json({message: "Job created"});
+                        })               
+                    })
+                    .catch(err => {
+                        logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))
+                        return res.status(502).json({message: "error while creating Job"});
+                    });
+                }
+                else {
+                    logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))
+                    return res.status(502).json({message: `error while creating Job - ${err}`});
+                }
             })
-            .catch(err => {
-                logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))
-                console.log(err);
-                return res.status(502).json({message: "error while creating Job"});
-            });
-
         })
-
     })
     .catch( err => {
         logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))

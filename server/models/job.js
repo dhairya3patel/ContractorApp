@@ -117,7 +117,16 @@ let jobSchema = new Schema({
     cost: {
         type: Number,
         default: 0
+    },
+    latitude: {
+        type: Number,
+        default: 0
+    },
+    longitude: {
+        type: Number,
+        default: 0
     }
+
 },
 {
     collection: "job"
