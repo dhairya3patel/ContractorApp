@@ -81,26 +81,6 @@ const LoginScreen = ({navigation}) => {
       Alert.alert("Please enter a valid password");
 
     else {
-      // encryptData(
-      //   password
-      // )
-      // .then( cipher => {
-      //   console.log(cipher)
-      // }).catch(err => {
-      //   console.log(err)
-      // })
-      // Aes.randomKey(64).then(KEY => {
-      //   console.log(KEY)
-      //   let key = KEY.slice(0, 64)
-      //   console.log('key', key)
-      //   let iv = KEY.slice(64,96)
-      //   console.log(iv)
-      //   Aes.encrypt(password, key, iv, 'aes-256-cbc').then(cipherText => {
-      //     let temp = cipherText.toString('hex');
-      //     console.log(temp)
-      //     setCipher(temp + '.' + key + '.' + iv);
-      //     console.log(cipher)
-        // let salt = await BcryptReactNative.getSalt(12);
         let hash = await BcryptReactNative.hash(SALT, password.toString());
         // console.log(hash)
         axios({

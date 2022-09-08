@@ -7,6 +7,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BidScreen from '../screens/Manager/Bid';
 import BidList from '../screens/Manager/BidList';
 import AddJobScreen from '../screens/Manager/AddJob';
+import TrackScreen from '../screens/Manager/Tracking';
+import ActiveDetails from '../screens/Manager/ActiveDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +28,21 @@ const BidStack = () => {
           options={{
             headerShown: false, cardStyle: { backgroundColor: '#ffffff' }
           }}
-        />  
+        />
+        <Stack.Screen
+          name="TrackScreen"
+          component={TrackScreen}
+          options={{
+            headerShown: false, cardStyle: { backgroundColor: '#ffffff' }
+          }}
+        />         
+        <Stack.Screen
+          name="ActiveDetails"
+          component={ActiveDetails}
+          options={{
+            headerShown: false, cardStyle: { backgroundColor: '#ffffff' }
+          }}
+        />          
     </Stack.Navigator>
 
 

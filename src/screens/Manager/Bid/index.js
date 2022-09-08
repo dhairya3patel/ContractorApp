@@ -106,9 +106,14 @@ const BidScreen = ({navigation}) => {
   };
 
   const viewItem = item => {
-    navigation.navigate('BidList', {
-      item,
-    });
+    if (value === "Bids")
+      navigation.navigate('BidList', {
+        item,
+      });
+    else if (value === 'Active') 
+      navigation.navigate('JobDetails', {
+        item,
+      });
   };
 
 
@@ -116,8 +121,12 @@ const BidScreen = ({navigation}) => {
     switch(value) {
       case "Bids":
         return <ListCard item={item} viewItem={viewItem}/>;
-      case "Assigned" || "Active" || "Completed":
+      case "Assigned":
         return <AssignedCard item={item} viewItem={viewItem}/>;
+      case "Active":
+        return <ListCard item={item} viewItem={viewItem}/>;
+      case "Completed":
+        return <AssignedCard item={item} viewItem={viewItem}/>;        
       default:
         return <ListCard item={item} viewItem={viewItem}/>;        
     }
