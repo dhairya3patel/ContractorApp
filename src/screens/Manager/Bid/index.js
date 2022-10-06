@@ -53,7 +53,7 @@ const BidScreen = ({navigation}) => {
   const [flatListRef, setFlatListRef] = useState("");
   const colorScheme = useColorScheme();
   const [textColor, setTextColor] = useState('#000');
-  const [value, setValue] = useState('Unselected');
+  const [value, setValue] = useState('Bids');
   const [selectedIndex, setSelectedIndex] = useState(0);
   // useEffect(() => {
   //   setTextColor(colorScheme === 'dark' ? '#FFF' : '#000');
@@ -106,6 +106,7 @@ const BidScreen = ({navigation}) => {
   };
 
   const viewItem = item => {
+    console.log(value)
     if (value === "Bids")
       navigation.navigate('BidList', {
         item,

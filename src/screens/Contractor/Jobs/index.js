@@ -22,8 +22,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
 import CheckBox from '@react-native-community/checkbox'
 import axios from 'axios';
-import Geolocation from 'react-native-geolocation-service';
-import RNLocation from 'react-native-location'; 
 
 import ListCard from "../../../components/Contractor/ListCard";
 import BidCard from "../../../components/Contractor/BidCard";
@@ -80,44 +78,11 @@ const JobsScreen = ({navigation}) => {
   const [isSelectedLoc6, setSelectionLoc6] = useState(false) 
 
   const [dataSource, setDataSource] = useState("");
-  let location;
   useEffect (() => {
     
     getJobs(value)
-    // getLocation()
-    Geolocation.getCurrentPosition(
-      (info) => {
-        console.log(info)
-      },
-      (error) => {
-        console.log(error)
-      },{ enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 })
-    
+      
   },[value])
-
-  // const getLocation = (value='null') => {
-  //   RNLocation.configure({
-  //     distanceFilter: 5.0
-  //   })
-     
-  //   RNLocation.requestPermission({
-  //     ios: "whenInUse",
-  //     android: {
-  //       detail: "coarse"
-  //     }
-  //   }).then(async granted => {
-  //       if (granted) {
-  //         RNLocation.getLatestLocation({timeout: 100})
-  //         .then(location => {
-  //           console.log(location)
-  //         })
-  //       }
-  //     })
-  //     .catch(e => {
-  //       console.log(e)
-  //     })
-
-  // }
 
   const handleModal = () => setIsModalVisible(() => !isModalVisible);  
 

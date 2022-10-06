@@ -8,6 +8,7 @@ import JobsScreen from "../screens/Contractor/Jobs";
 import ProfileScreen from "../screens/Contractor/Profile";
 import JobDetails from "../screens/Contractor/JobDetails";
 import AssignedDetails from '../screens/Contractor/AssignedDetails';
+import TrackScreen from '../screens/Contractor/Tracking';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,14 @@ const JobStack = () => {
             headerShown: false, cardStyle: { backgroundColor: '#ffffff' }
           }}
         />          
+        <Stack.Screen
+          name="Tracking"
+          component={TrackScreen}
+          options={{
+            headerShown: false, cardStyle: { backgroundColor: '#ffffff' }
+          }}
+        />        
+
     </Stack.Navigator>
 
 

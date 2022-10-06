@@ -28,7 +28,7 @@ const AssignedCard = ({item, viewItem}) => {
           <Text style={styles.title}>{item.po}</Text>
           <Text style={styles.subtitle}>Location: {item.city}, {item.zip}</Text>
           <Text style={styles.subtitle}>Date of Completion: {dateString}</Text>
-          <Text style={styles.subtitle}>Assigned To: {item.assignedTo.name}</Text>
+          {/* <Text style={styles.subtitle}>Assigned To: {item.assignedTo.name}</Text> */}
           <Text style={styles.subtitle}>Bid: $ {item.cost}</Text>
           <Text style={styles.subtitle}>Time Remaining: {remTime} minutes</Text>
         </View>

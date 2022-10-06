@@ -20,6 +20,9 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import ContractorTabs from './src/navigation/ContractorTabs';
 import ManagerTabs from './src/navigation/ManagerTabs';
 import AdminTabs from './src/navigation/AdminTabs';
+import {enableLatestRenderer} from 'react-native-maps';
+
+enableLatestRenderer();
 
 const Tab = createMaterialBottomTabNavigator();
 
