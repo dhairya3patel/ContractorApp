@@ -88,29 +88,31 @@ const AssignedDetails = ({route, navigation}) => {
   })
 
   const setActive = () => {
-    // axios({
-    //   method: 'post',
-    //   url: `${API_URL}/changejobstatus`,
-    //   data: {
-    //     id: job.item._id,
-    //     status: job.item.status == "Assigned" ? "Active" : "Completed"
-    //   },
-    //   timeout: 4000,
-    // })
-    // .then( res => {
-    //   // console.log(res.status);
-    //   if (res.status == 200) {
-    //     // alert("Bid Submitted!");
-    //     if (job.item.status == 'Assigned')
-          navigation.navigate('Tracking',job)
-    //     else
-    //       navigation.navigate("Jobs");
-    //   }
-    // })
-    // .catch(error => {
-    //   console.log(error);
-    //   alert(error);            
-    // })
+    axios({
+      method: 'post',
+      url: `${API_URL}/changejobstatus`,
+      data: {
+        id: job.item._id,
+        status: job.item.status == "Assigned" ? "Active" : "Completed"
+      },
+      timeout: 4000,
+    })
+    .then( res => {
+      // console.log(res.status);
+      if (res.status == 200) {
+        // alert("Bid Submitted!");
+// -------------------------- UNCOMMENT FOR LOCATION TRACKING-------------------------------------        
+        // if (job.item.status == 'Assigned')
+        //   navigation.navigate('Tracking',job)
+        // else
+// -------------------------- UNCOMMENT FOR LOCATION TRACKING-------------------------------------                
+          navigation.navigate("Jobs");
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      alert(error);            
+    })
   }
   // console.log(pdf)
   const colorScheme = useColorScheme();
