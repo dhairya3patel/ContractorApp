@@ -7,7 +7,7 @@ import { uploadImage} from '../controllers/uploadImage.js';
 import { isAuth, decodeToken } from '../middleware/auth.js';
 import { getDoc } from '../controllers/docs.js';
 import {createBid, getBidsByUser, getBidsByJob, acceptBid, getYourBid } from '../controllers/bid.js'
-import { deleteUser, getUserDetails, getUsers } from '../controllers/user.js';
+import { deleteUser, getUserDetails, getUsers, rateUser } from '../controllers/user.js';
 import Image from '../models/image.js';
 
 const require = createRequire(import.meta.url);
@@ -67,6 +67,8 @@ router.get('/getuserdetails', getUserDetails)
 router.post('/getusers', getUsers);
 
 router.post('/deleteuser', deleteUser);
+
+router.post('/rateuser', rateUser)
 
 router.post('/changejobstatus', changeJobStatus)
 

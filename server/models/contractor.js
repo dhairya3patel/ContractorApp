@@ -43,9 +43,8 @@ let contractorSchema = new Schema({
       avg: 0, 
       jobsCompleted: 0,
       ongoing: 0,
-      availability: "good",
-      service: "good",
-      quality: "good"
+      availability: 3,
+      quality: 3
     }
   }
 }, {

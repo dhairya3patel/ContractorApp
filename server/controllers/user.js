@@ -208,4 +208,51 @@ const deleteUser = (req, res, next) => {
     })
 }
 
-export {getUserDetails, getUsers, deleteUser};
+const rateUser = (req, res, next) => {
+    const token = decodeToken(req);
+    const user = token["id"]
+
+    logger.info(JSON.stringify({'user': user,'message':' rateUser Request'}))
+    logger.info(JSON.stringify({'user': user,'message':JSON.stringify(req.body)}))
+
+    User.findOne({
+        _id: user,
+    })
+    .then( user => {
+        if (user.role == "Admin" || user.role == 'Manager') {
+            Contractor.findOne({
+                _id: req.body.contractor
+            })
+            .then(contractor => {
+                var availability = contractor.rating.availability
+                var quality = contractor.rating.quality
+                var jobs = contractor.rating.jobsCompleted
+
+                var totalAvailability = (availability * jobs) + req.body.rating.availability
+                var totalQuality = (quality * jobs)  + req.body.rating.quality
+                var avgAvailability = (totalAvailability) / (jobs + 1)
+                var avgQuality = (totalQuality) / (jobs + 1)
+                var avg = (avgAvailability + avgQuality) / 2
+                
+                contractor.rating = {
+                    "avg": avg, 
+                    "jobsCompleted": jobs + 1,
+                    "ongoing": contractor.rating.ongoing,
+                    "availability": avgAvailability,
+                    "quality": avgQuality
+                }
+                contractor.save()   
+                return res.status(200).json({
+                    message: "Rating Updated"
+                })                    
+            })
+        }
+    })
+    .catch(err => {
+        logger.error(JSON.stringify({'user': user,'message': `rateUser ${err}`}))
+        console.log(err);
+        return res.status(404).json({message: "User not found"});
+    })
+}
+
+export {getUserDetails, getUsers, deleteUser, rateUser};

@@ -22,6 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
 import CheckBox from '@react-native-community/checkbox'
 import axios from 'axios';
+import {useForm, Controller} from 'react-hook-form'
 
 import UserCard from "../../../components/Admin/UserCard.js";
 import { API_URL } from "../../../constants.js";
@@ -49,7 +50,7 @@ const UsersScreen = ({navigation}) => {
     .catch(error => {
       // console.log(res.data)
       // console.log(error);
-      // alert(error);            
+      alert(error);            
     })    
   }
 
@@ -93,6 +94,12 @@ const UsersScreen = ({navigation}) => {
   const handleContractorModal = () => setIsContractorModalVisible(() => !isContractorModalVisible);
   const handleManagerModal = () => setIsManagerModalVisible(() => !isManagerModalVisible);
 
+  const [isRatingModalVisible, setIsRatingModalVisible] = React.useState(false);
+  const handleRatingModal = () => setIsRatingModalVisible(() => !isRatingModalVisible);
+  const displayRatingModal = () => {
+    setIsContractorModalVisible(() => !isContractorModalVisible)
+    setIsRatingModalVisible(() => !isRatingModalVisible)
+  }
   const [contractor, setContractor] = useState({
     _id: "",
     name: "",
@@ -135,6 +142,41 @@ const UsersScreen = ({navigation}) => {
     
   },[])
 
+
+  const {
+    control, 
+    handleSubmit, 
+    formState: {errors, isValid}
+  } = useForm({mode: 'onBlur'})
+
+  const onSubmit = data => {
+
+    console.log(data);
+
+    axios({
+      method: 'post',
+      url: `${API_URL}/rateuser`,
+      data: {
+        contractor: contractor._id,
+        rating:data,
+      },
+      timeout: 4000,
+    })
+    .then( res => {
+      console.log(res);
+      if (res.status == 200) {
+        alert("Rating Updated")
+        handleRatingModal
+      }
+      else
+        alert(res.data.message);
+    })
+    .catch(error => {
+      console.log(error);
+      alert(error);            
+    })      
+
+  }  
 
   const ItemSeparator = () => <View style={{
     height: 2,
@@ -251,11 +293,84 @@ const UsersScreen = ({navigation}) => {
             <TouchableOpacity style={styles.loginBtn} onPress={() => deleteItem(contractor)} >
               <Text style={styles.loginText}>Delete Contractor</Text>
             </TouchableOpacity>
-            {/* <TouchableOpacity style={styles.loginBtn}>
+            <TouchableOpacity style={styles.ratingBtn} onPress={displayRatingModal}>
               <Text style={styles.loginText}>Rate Contractor</Text>
-            </TouchableOpacity>                           */}
+            </TouchableOpacity>                          
           </View>
         </Modal>
+
+        <Modal isVisible={isRatingModalVisible}>
+          <View style={styles.modalWrapper}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={handleRatingModal}>
+                <Icon name={"times"} color={"#334A65"} size={20} style={{margin: 10, marginTop: 15, marginRight: "90%",}} />
+              </TouchableOpacity>            
+            </View>
+            <View style={styles.modalDetails}>
+              <View style={styles.modalSection}>
+              {/* <View style={styles.row}> */}
+                <View style={styles.label}>
+                    <Text style={styles.title}>Availability</Text>
+                </View>
+                <View style={styles.inputView}>
+                  <Controller
+                    control={control}        
+                    name="availability"
+                    render={({field: {onChange, value, onBlur}}) => (
+                      <TextInput
+                          keyboardType="numeric"
+                          style={styles.TextInput}
+                          placeholder="Availability"
+                          placeholderTextColor="#BDBDBD"
+                          value={value}
+                          onBlur={onBlur}
+                          onChangeText={value => onChange(value)}
+                      />
+                    )}
+                    rules={{
+                      required: {
+                        value: true,
+                        message: 'Field is required!'
+                      }
+                    }}                                
+                  />
+                </View>
+              </View>
+              <View style={styles.modalSection}>
+              {/* <View style={styles.row}> */}
+                <View style={styles.label}>
+                    <Text style={styles.title}>Quality</Text>
+                </View>
+                <View style={styles.inputView}>
+                  <Controller
+                    control={control}        
+                    name="quality"
+                    render={({field: {onChange, value, onBlur}}) => (
+                      <TextInput
+                          keyboardType="numeric"
+                          style={styles.TextInput}
+                          placeholder="Quality"
+                          placeholderTextColor="#BDBDBD"
+                          value={value}
+                          onBlur={onBlur}
+                          onChangeText={value => onChange(value)}
+                      />
+                    )}
+                    rules={{
+                      required: {
+                        value: true,
+                        message: 'Field is required!'
+                      }
+                    }}                                
+                  />
+                </View>
+              </View>              
+            </View>
+            <TouchableOpacity style={styles.loginBtn} onPress={handleSubmit(onSubmit)} >
+              <Text style={styles.loginText}>Submit Rating</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>        
         <Modal isVisible={isManagerModalVisible}>
           <View style={styles.modalWrapper}>
             <View style={styles.modalHeader}>
@@ -376,7 +491,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: "#F6F6F6",
     borderRadius: 10,
-    width: "90%",
+    width: "50%",
     height: 45,
     marginBottom: 20,
     borderRadius: 6,
@@ -437,6 +552,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
+  ratingBtn: {
+    width: "90%",
+    borderRadius: 25,
+    height: 50,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    // marginTop: 15,
+    backgroundColor: "#63C127",
+    // top: "0%",
+    marginBottom: 20,
+  },
+  
   loginText: {
     color: "#FFFFFF",
     fontFamily: 'Inter',
@@ -591,7 +719,12 @@ const styles = StyleSheet.create({
   },
   rightModal: {
     width: '50%'
-  }
+  },
+
+  label: {
+    // marginLeft: 20,    
+    width: "40%",
+  },  
 
 });
 

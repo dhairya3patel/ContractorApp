@@ -1,7 +1,7 @@
 import express from 'express';
 import router from './routes/routes.js';
 import {createRequire} from "module";
-import {ATLAS_URI} from "./constants.js"
+import {ATLAS_URI, DB_URI} from "./constants.js"
 
 
 const require = createRequire(import.meta.url);
@@ -25,7 +25,6 @@ mongoose.set('debug', true);
 
 const path = require('path');
 
-// const ATLAS_URI = "mongodb+srv://dhairyaPatel:4XiWnkxb915Rna4L@cluster0.pki6l.mongodb.net/contractor?retryWrites=true&w=majority"
 
 const app = express();
 const cors = require('cors');
@@ -55,12 +54,16 @@ app.use(router);
 
 mongoose
   .connect(ATLAS_URI)
+  // .connect(DB_URI,
+  //   {
+  //   tlsCAFile: `rds-combined-ca-bundle.pem`
+  //   })
   .then((x) => {
     logger.info(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
     console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
   })
   .catch((err) => {
-    logger.error('Error connecting to mongo', err.reason)    
+    logger.error('Error connecting to mongo', err)    
     console.error('Error connecting to mongo', err.reason)
   })
   
