@@ -63,4 +63,5 @@ buck-out/
 /server/logs/*
 /server/files/images/*
 constants.js
-.pem
+*.pem
+*.env
