@@ -64,6 +64,7 @@ mongoose
   })
   .catch((err) => {
     logger.error('Error connecting to mongo', err)    
+    console.error('Error connecting to mongo', err)    
     console.error('Error connecting to mongo', err.reason)
   })
   

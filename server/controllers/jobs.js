@@ -11,7 +11,6 @@ import Image from '../models/image.js';
 import Bid from '../models/bid.js';
 import { decodeToken } from '../middleware/auth.js';
 import contractor from "../models/contractor.js";
-import { MAPS_KEY, MAPS_URL } from "../constants.js";
 
 
 const require = createRequire(import.meta.url);
@@ -66,11 +65,11 @@ const createJob = (req, res, next) => {
                 provider: 'openstreetmap'
               };
                
-            let url = `${MAPS_URL}${req.body.address1}, ${req.body.address2}, ${req.body.city}, ${req.body.state} - ${req.body.zip}&key=${MAPS_KEY}`
-            request(url, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    const resp = body
-                    const coords = JSON.parse(resp).results[0].geometry.location
+            // let url = `${MAPS_URL}${req.body.address1}, ${req.body.address2}, ${req.body.city}, ${req.body.state} - ${req.body.zip}&key=${MAPS_KEY}`
+            // request(url, function (error, response, body) {
+            //     if (!error && response.statusCode == 200) {
+            //         const resp = body
+            //         const coords = JSON.parse(resp).results[0].geometry.location
                     Job.create(({
                         _id: uuidv4(),
                         po: req.body.po,
@@ -95,8 +94,8 @@ const createJob = (req, res, next) => {
                         equipment: req.body.equipment,
                         notes: req.body.notes,
                         createdBy: manager,
-                        latitude: coords.lat,
-                        longitude: coords.lng
+                        // latitude: coords.lat,
+                        // longitude: coords.lng
                     }))
                     .then(() => {
                         Image.find({
@@ -112,12 +111,12 @@ const createJob = (req, res, next) => {
                         logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))
                         return res.status(502).json({message: "error while creating Job"});
                     });
-                }
-                else {
-                    logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))
-                    return res.status(502).json({message: `error while creating Job - ${err}`});
-                }
-            })
+                // }
+                // else {
+                //     logger.error(JSON.stringify({'user': user,'message':`Error Creating Job: ${err}`}))
+                //     return res.status(502).json({message: `error while creating Job - ${err}`});
+                // }
+            // })
         })
     })
     .catch( err => {
